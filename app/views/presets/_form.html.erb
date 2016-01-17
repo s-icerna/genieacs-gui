@@ -17,6 +17,18 @@ filters = {
   <label for="weight">Weight</label><br />
   <input id="weight" name="weight" type="text" value="<%= @preset['weight'] %>" />
 </div>
+<br/>
+<div class="field">
+  <div style="float:left">
+    <label for="version">Version</label><br />
+    <input id="versionselect" name="versionselec" type="text"/>
+  </div>
+  <div>
+    <label for="version">Product Class</label><br />
+    <input id="productclassselect" name="productclassselec" type="text"/>
+  </div>
+  <button type="button" id="versionbutton">choose</button>
+</div>
 <h2>Precondition</h2>
 <div id="precondition">
   <% precondition = @preset['precondition'].is_a?(Hash) ? @preset['precondition'].to_json : @preset['precondition'] %>

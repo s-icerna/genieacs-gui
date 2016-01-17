@@ -1,7 +1,7 @@
 window.addValueConfiguration = (container, name = '', value = '', fade = true) ->
   html = """<div configurationType="value">
       Set
-      <input type="text" _name="name" value="#{name}" />
+      <input class="addac" type="text" _name="name" value="#{name}" />
       to
       <input type="text" _name="value" value="#{value}" />
       <a href="#" class="action" onclick="fadeOutAndRemove($(this).parent());return false;">&nbsp;x&nbsp;</a>
