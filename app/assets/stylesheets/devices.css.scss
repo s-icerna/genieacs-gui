@@ -54,6 +54,9 @@
         user-select: all;
         color: rgb(70,60,0);
       }
+      .param-path:hover {
+	cursor:pointer;
+      }
       .param-value {
         user-select: all;
       }
