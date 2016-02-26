@@ -1,57 +1,104 @@
-$(document).on 'page:load', ->
-  softwareversions = []
-  productclasses = []
-  autocomnames = []
-  svvalue = 'data[i].InternetGatewayDevice.DeviceInfo.SoftwareVersion._value'
-  pcvalue = 'data[i]._deviceId._ProductClass'
-  jsonfile = '/devices'
+softwareversions = []
+productclasses = []
+configparamwritablebool = []
+configparamwritable = []
+objnames = []
+objparamwritable = []
+svvalue = 'this.InternetGatewayDevice.DeviceInfo.SoftwareVersion._value'
+pcvalue = 'this._deviceId._ProductClass'
+devicejson = '/devices'
+objjson = '/objects'
 
-  recpathsearchwritable = (obj) ->
-    $.each obj, (key, value) ->
-      if $.type(value) == 'object'
-        oldobj = obj
-        obj = value
-        recpathsearchwritable obj
-        obj = oldobj
-      if key == '_path' and obj._writable == true
-        autocomnames.push obj._path
-      return
-    return
+allpar = (obj) ->
+  $.each obj, (key, value) ->
+    oobj = undefined
+    if $.type(value) == 'object'
+      oobj = obj
+      obj = value
+      allpar obj
+      obj = oobj
+    if key == '_path'
+      if obj._object == true and obj._writable
+        objparamwritable.push obj._path
+      if obj._type
+        if obj._writable
+          configparamwritable.push obj._path
+        if obj._type == 'xsd:boolean'
+          configparamwritablebool.push obj._path
 
-  autocom = (field, source) ->
-    $(field).autocomplete source: source
-    return
+getsv = (data) ->
+  $.each data, ->
+    softwareversions.push eval(svvalue)
+    softwareversions = $.unique(softwareversions)
 
-  getvalues = (data) ->
-    $.each data, (i) ->
-      softwareversions.push eval(svvalue)
+getpc = (data) ->
+  txt = $('#versionselect').val()
+  $.each data, (sv) ->
+    if eval(svvalue) == txt
       productclasses.push eval(pcvalue)
-      return
-    return
+      productclasses = $.unique(productclasses)
 
-  parampush = (data) ->
-    versionchoose = $('#versionselect').val()
-    productclasschoose = $('#productclassselect').val()
-    $.each data, (i) ->
-      if eval(svvalue) == versionchoose and eval(pcvalue) == productclasschoose
-        idforautocomplete = data[i]._id
-        $.getJSON jsonfile + '/' + idforautocomplete, (obj) ->
-          ke = obj.InternetGatewayDevice
-          recpathsearchwritable ke
-          autocom '.addac', autocomnames
-          return
-      return
-    return
+getobjects = (data) ->
+  $.each data, ->
+    objnames.push @_id
 
-  $.getJSON jsonfile, getvalues
+parampush = (data) ->
+  versionchoose = $('#versionselect').val()
+  productclasschoose = $('#productclassselect').val()
+  $.each data, (i) ->
+    if eval(svvalue) == versionchoose and eval(pcvalue) == productclasschoose
+      id = data[i]._id
+      configparamwritable.length = objparamwritable.lenght = configparamwritablebool.lenght = objnames.lenght = 0
+      $.getJSON devicejson + '/' + id, (obj) ->
+        ke = obj.InternetGatewayDevice
+        allpar ke
+        autocom '.accon', configparamwritable
+        autocom '.acobjparam', objparamwritable
+        autocom '.acobj', objnames
+
+      $.getJSON objjson, getobjects
+      if $('#notfound').length
+        $('#notfound').text('Match found!').css 'color', 'black'
+      else
+        $('#choose').after '<p id="notfound" style="display:inline;">Match found! Go on with Autocomplete!</p>'
+    else
+      if $('#notfound').length
+        $('#notfound').text 'Again! No Match found!'
+      else
+        $('#choose').after '<p id="notfound" style="color:red; display:inline;">No match found! Choose another one!</p>'
+
+autocom = (field, source) ->
+  $(field).autocomplete(
+    source: source
+    minLength: 0).focus ->
+    $(this).autocomplete 'search'
+
+$(document).on 'page:change', ->
+  $.getJSON devicejson, getsv
   autocom '#versionselect', softwareversions
-  autocom '#productclassselect', productclasses
-  $('#versionbutton').click ->
-    versionchoose = $('#versionselect').val()
-    productclasschoose = $('#productclassselect').val()
-    $.getJSON jsonfile, parampush
-    return
+  $('#versionselect').focusout ->
+    $.getJSON devicejson, getpc
+    autocom '#productclassselect', productclasses
+
+  $('#choose').click ->
+    $.getJSON devicejson, parampush
+
+  $('.accon').focusout ->
+    if $.inArray($(this).val(), configparamwritablebool) >= 0
+      autocom $(this).next(), [
+        'true'
+        'false'
+      ]
+
   $('.action').click ->
-    autocom '.addac', autocomnames
-    return
-  return
+    autocom '.accon', configparamwritable
+    autocom '.acobjparam', objparamwritable
+    autocom '.acobj', objnames
+    $('.accon').focusout ->
+      if $.inArray($(this).val(), configparamwritablebool) >= 0
+        autocom $(this).next(), [
+          'true'
+          'false'
+        ]
+      else
+        autocom $(this).next(), []
