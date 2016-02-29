@@ -67,7 +67,7 @@ parampush = (data) ->
       else
         $('#choose').after '<p id="notfound" style="color:red; display:inline;">No match found! Choose another one!</p>'
 
-autocom = (field, source) ->
+window.autocom = (field, source) ->
   $(field).autocomplete(
     source: source
     minLength: 0).focus ->

@@ -6,12 +6,6 @@ content_for :title do 'Device ' + @device['_id'] end
 var pending = {};
 
 $(function() {
-  var options = {
-    valueNames: ['param-path', 'param-value'],
-    page: 4000
-  };
-
-  var featureList = new List('device-params', options);
   refreshPending();
 });
 </script>
@@ -123,7 +117,7 @@ $(function() {
 <% if can?(:read, 'devices/parameters') %>
 <h2>Device parameters</h2>
 <div id="device-params">
-  <input class="search" type="search" placeholder="Type to search..." />
+  <input class="search" type="search" onfocus="searchparam()" placeholder="Type to search...." />
   <ul class="list">
     <% for p in @device_params %>
     <li>
@@ -145,7 +139,7 @@ $(function() {
         <% else %>
           <% if p['_writable'] and can_edit_parameters %>
             <% options = Rails.configuration.parameters_edit[p['_path'].gsub(/\.\d+\./, '..')] %>
-            <a href="#" onclick='editParam("<%= p['_path']%>", "<%= p['_type'] %>", <%= p['_value'].to_json.html_safe %>, <%= options.to_json.html_safe %>);return false;'>Edit</a>
+            <a href="#" onclick='editParam("<%= p['_path']%>", "<%= p['_type'] %>", <%= p['_value'].to_json.html_safe %>, <%= options.to_json.html_safe %>);getsupported("<%=p['_path']%>");return false;'>Edit</a>
           <% end %>
           <a href="#" onclick="refreshParam('<%= p['_path']%>');return false;">Refresh</a>
         <% end %>
