@@ -1,6 +1,5 @@
-$(document).on 'page:change', ->
-  pathname = '#device-params ul li'
-
+pathname = '#device-params ul li'
+window.setData = ->  
   setIcons = (lev, nlev) ->
     arrowandtab = ''
     arrow = '<span class="arrow">&#9205;</span>'
@@ -26,6 +25,7 @@ $(document).on 'page:change', ->
     txt = $(this).text()
     txtwithoutvalue = txt.split(' ', 1)
     path = txtwithoutvalue[0].split('.')
+    $(this).attr 'onclick': 'openandclose(this)'
     $(this).parent().attr
       'data-weight': path.length
       'data-hidden': 0
@@ -36,28 +36,32 @@ $(document).on 'page:change', ->
     $(this).children('.param-path').before setIcons(level, nlevel)
     if level > 2
       $(this).hide().data 'hidden', 1
-
-  $(pathname + ' .param-path').click ->
-    pli = $(this).parent()
-    level = pli.data('weight')
-    ndata = pli.next().data()
-    nhidden = ndata.hidden
-    nlevel = ndata.weight
-    lilevel = 'li[data-weight=\'' + level + '\']'
-    if level < nlevel and nhidden == 0
-      pli.children('.arrow').html '&#9205;'
-      pli.nextUntil(lilevel).hide().data('hidden', 1).children('.arrow').html '&#9205;'
-    else
-      pli.children('.arrow').html '&#9207;'
-      pli.nextUntil(lilevel).filter('li[data-weight=\'' + nlevel + '\']').show().data 'hidden', 0
-
-  $('.search').focusin ->
-    $(pathname).each ->
-      $(this).show().data 'hidden', 0
       
-  $('.search').focusout ->
-    if !$('.search').val()
-      $(pathname).each ->
-        level = $(this).data('weight')
-        if level > 2
-          $(this).hide().data 'hidden', 1
+  $('input.search').attr 
+    'onfocus': 'openAll()'
+    'onblur': 'closeAll()'
+
+window.openandclose = (e) ->
+  pli = $(e).parent()
+  level = pli.data('weight')
+  ndata = pli.next().data()
+  nhidden = ndata.hidden
+  nlevel = ndata.weight
+  lilevel = 'li[data-weight=\'' + level + '\']'
+  if level < nlevel and nhidden == 0
+    pli.children('.arrow').html '&#9205;'
+    pli.nextUntil(lilevel).hide().data('hidden', 1).children('.arrow').html '&#9205;'
+  else
+    pli.children('.arrow').html '&#9207;'
+    pli.nextUntil(lilevel).filter('li[data-weight=\'' + nlevel + '\']').show().data 'hidden', 0
+
+window.openAll = ->
+  $(pathname).each ->
+    $(this).show().data 'hidden', 0
+
+window.closeAll = ->
+  if !$('.search').val()
+    $(pathname).each ->
+      level = $(this).data('weight')
+      if level > 2
+        $(this).hide().data 'hidden', 1
