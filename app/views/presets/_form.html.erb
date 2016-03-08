@@ -21,13 +21,13 @@ filters = {
 <div class="field">
   <div style="float:left">
     <label for="version">Version</label><br />
-    <input id="versionselect" name="versionselec" type="text"/>
+    <input id="versionselect" name="versionselec" type="text" onfocus="getsv();return false;"/>
   </div>
   <div>
     <label for="version">Product Class</label><br />
-    <input id="productclassselect" name="productclassselec" type="text"/>
+    <input id="productclassselect" name="productclassselec" type="text" onfocus="getpc();return false;"/>
   </div>
-  <button type="button" id="choose">choose</button>
+  <button type="button" id="choose" onclick="parampush();">choose</button><p id="notfound" style="display:inline"></p>
 </div>
 <h2>Precondition</h2>
 <div id="precondition">

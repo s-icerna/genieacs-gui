@@ -26,47 +26,50 @@ allpar = (obj) ->
         if obj._type == 'xsd:boolean'
           configparamwritablebool.push obj._path
 
-getsv = (data) ->
-  $.each data, ->
-    softwareversions.push eval(svvalue)
-    softwareversions = $.unique(softwareversions)
+window.getsv = ->
+  softwareversions.length=0
+  $.getJSON devicejson, (data) ->
+    $.each data, ->
+      softwareversions.push eval(svvalue)
+      softwareversions = $.unique(softwareversions)
+  autocom '#versionselect', softwareversions
 
-getpc = (data) ->
+window.getpc = ->
   txt = $('#versionselect').val()
-  $.each data, (sv) ->
-    if eval(svvalue) == txt
-      productclasses.push eval(pcvalue)
-      productclasses = $.unique(productclasses)
+  productclasses.length = 0
+  $.getJSON devicejson, (data) ->
+    $.each data, (sv) ->
+      if eval(svvalue) == txt
+        productclasses.push eval(pcvalue)
+        productclasses = $.unique(productclasses)
+  autocom '#productclassselect', productclasses
 
 getobjects = (data) ->
   $.each data, ->
     objnames.push @_id
 
-parampush = (data) ->
+window.parampush = ->
   versionchoose = $('#versionselect').val()
   productclasschoose = $('#productclassselect').val()
-  $.each data, (i) ->
-    if eval(svvalue) == versionchoose and eval(pcvalue) == productclasschoose
-      id = data[i]._id
-      configparamwritable.length = objparamwritable.lenght = configparamwritablebool.lenght = objnames.lenght = 0
+  idarr = []
+  $.getJSON devicejson, (data) ->
+    $.each data, (i) ->
+      if eval(svvalue) == versionchoose and eval(pcvalue) == productclasschoose
+        idarr.push data[i]._id
+    if idarr.length > 0
+      id=idarr[0]
+      configparamwritable.length = objparamwritable.length = configparamwritablebool.length = 0
       $.getJSON devicejson + '/' + id, (obj) ->
         ke = obj.InternetGatewayDevice
         allpar ke
         autocom '.accon', configparamwritable
         autocom '.acobjparam', objparamwritable
         autocom '.acobj', objnames
-
       $.getJSON objjson, getobjects
-      if $('#notfound').length
-        $('#notfound').text('Match found!').css 'color', 'black'
-      else
-        $('#choose').after '<p id="notfound" style="display:inline;">Match found! Go on with Autocomplete!</p>'
+      $('#notfound').text 'Match found'
     else
-      if $('#notfound').length
-        $('#notfound').text 'Again! No Match found!'
-      else
-        $('#choose').after '<p id="notfound" style="color:red; display:inline;">No match found! Choose another one!</p>'
-
+      $('#notfound').text 'No match'
+     
 window.autocom = (field, source) ->
   $(field).autocomplete(
     source: source
@@ -74,23 +77,15 @@ window.autocom = (field, source) ->
     $(this).autocomplete 'search'
 
 $(document).on 'page:change', ->
-  $.getJSON devicejson, getsv
-  autocom '#versionselect', softwareversions
-  $('#versionselect').focusout ->
-    $.getJSON devicejson, getpc
-    autocom '#productclassselect', productclasses
-
-  $('#choose').click ->
-    $.getJSON devicejson, parampush
-
   $('.accon').focusout ->
     if $.inArray($(this).val(), configparamwritablebool) >= 0
       autocom $(this).next(), [
         'true'
         'false'
       ]
-
-  $('.action').click ->
+    else
+      autocom $(this).next(), []
+  $('div.filter_selection.configurations_selection div.popup a.action').click ->
     autocom '.accon', configparamwritable
     autocom '.acobjparam', objparamwritable
     autocom '.acobj', objnames
