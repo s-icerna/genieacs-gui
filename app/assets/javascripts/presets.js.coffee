@@ -1,7 +1,7 @@
 window.addValueConfiguration = (container, name = '', value = '', fade = true) ->
   html = """<div configurationType="value">
       Set
-      <input class="accon" type="text" _name="name" value="#{name}" />
+      <input type="text" _name="name" value="#{name}" />
       to
       <input type="text" _name="value" value="#{value}" />
       <a href="#" class="action" onclick="fadeOutAndRemove($(this).parent());return false;">&nbsp;x&nbsp;</a>
@@ -95,9 +95,9 @@ window.addRemoveTagConfiguration = (container, tag = '', fade = true) ->
 window.addAddObjectConfiguration = (container, name = '', object = '', fade = true) ->
   html = """<div configurationType="add_object">
       Add object
-      <input class="acobj" type="text" _name="object" value="#{object}" />
+      <input type="text" _name="object" value="#{object}" />
       to
-      <input class="acobjparam" type="text" _name="name" value="#{name}" />
+      <input type="text" _name="name" value="#{name}" />
       <a href="#" class="action" onclick="fadeOutAndRemove($(this).parent());return false;">&nbsp;x&nbsp;</a>
     </div>"""
 

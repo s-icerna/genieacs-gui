@@ -4,6 +4,7 @@ window.getsupported = (path) ->
   if txt[txt.length - 1].indexOf(op) >= 0
     sup = path.replace(op, 'Supported')
     arr = $('li:contains(' + sup + ')').children('.param-value').text().split(',')
+    $('div.modal-wrapper div.modal input').attr 'class': 'acop'
     autocom '.acop', arr
 
 window.searchparam = ->
@@ -16,3 +17,20 @@ window.searchparam = ->
     else
       $('.param-path').parent().hide()
       $('.param-path:containsIN("' + txt + '")').parent().show()
+      
+window.setdeviceautocomplete=->
+  $('.search').attr 'onfocus': 'searchparam();'
+  $.each $('.param-path:contains("Operating")'), ->
+    clickfunc=$(this)
+      .parent()
+      .children '.actions'
+      .children 'a'
+      .filter ':first'
+      .attr 'onclick'
+      .split ';'
+    $(this)
+      .parent()
+      .children '.actions'
+      .children 'a'
+      .filter ':first'
+      .attr 'onclick': clickfunc[0]+';getsupported("'+$(this).text()+'");return false;'

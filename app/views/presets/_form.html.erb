@@ -21,11 +21,11 @@ filters = {
 <div class="field">
   <div style="float:left">
     <label for="version">Version</label><br />
-    <input id="versionselect" name="versionselec" type="text" onfocus="getsv();return false;"/>
+    <input id="versionselect" name="versionselec" type="text" onblur="getpc();return false;"/>
   </div>
   <div>
     <label for="version">Product Class</label><br />
-    <input id="productclassselect" name="productclassselec" type="text" onfocus="getpc();return false;"/>
+    <input id="productclassselect" name="productclassselec" type="text"/>
   </div>
   <button type="button" id="choose" onclick="parampush();">choose</button><p id="notfound" style="display:inline"></p>
 </div>
@@ -54,5 +54,6 @@ filters = {
 $(function() {
   initFilters('precondition');
   initConfigurations('configurations');
+  setautocomplete();
 });
 </script>

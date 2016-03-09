@@ -184,7 +184,7 @@ prompt = (paramName, paramType, defaultValue, options, callback) ->
       if options?.options?
         input = $('<select>' + ("<option value='#{o}'>#{o}</option>" for o in options.options).join('') + '</select>')
       else
-        input = $("<input class=\"acop\" type=\"text\" value=\"#{defaultValue}\"/>")
+        input = $("<input type=\"text\" value=\"#{defaultValue}\"/>")
       input.val(defaultValue)
 
   modal.append(input)

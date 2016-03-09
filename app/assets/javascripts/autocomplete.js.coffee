@@ -8,6 +8,7 @@ svvalue = 'this.InternetGatewayDevice.DeviceInfo.SoftwareVersion._value'
 pcvalue = 'this._deviceId._ProductClass'
 devicejson = '/devices'
 objjson = '/objects'
+newconfig = 'div.filter_selection.configurations_selection div.popup a.action'
 
 allpar = (obj) ->
   $.each obj, (key, value) ->
@@ -26,7 +27,7 @@ allpar = (obj) ->
         if obj._type == 'xsd:boolean'
           configparamwritablebool.push obj._path
 
-window.getsv = ->
+getsv = ->
   softwareversions.length=0
   $.getJSON devicejson, (data) ->
     $.each data, ->
@@ -69,14 +70,23 @@ window.parampush = ->
       $('#notfound').text 'Match found'
     else
       $('#notfound').text 'No match'
-     
+
 window.autocom = (field, source) ->
   $(field).autocomplete(
     source: source
     minLength: 0).focus ->
     $(this).autocomplete 'search'
 
-$(document).on 'page:change', ->
+window.setautocomplete = ->
+  getsv()
+  $.each $('[configurationType="value"]'),->
+    $(this).children(':input').filter(':first').attr 'class': 'accon'
+  $.each $('[configurationType="add_object"]'),->
+    $(this).children(':input').filter(':first').attr({ 'class' : 'acobj' })
+    $(this).children(':input').filter(':last').attr({ 'class' : 'acobjparam' })
+  $.each $(newconfig), ->
+    clickfunc=($(this).attr 'onclick').split ';'
+    $(this).attr 'onclick': clickfunc[0]+';addautocom();return false;'
   $('.accon').focusout ->
     if $.inArray($(this).val(), configparamwritablebool) >= 0
       autocom $(this).next(), [
@@ -85,15 +95,16 @@ $(document).on 'page:change', ->
       ]
     else
       autocom $(this).next(), []
-  $('div.filter_selection.configurations_selection div.popup a.action').click ->
-    autocom '.accon', configparamwritable
-    autocom '.acobjparam', objparamwritable
-    autocom '.acobj', objnames
-    $('.accon').focusout ->
-      if $.inArray($(this).val(), configparamwritablebool) >= 0
-        autocom $(this).next(), [
-          'true'
-          'false'
-        ]
-      else
-        autocom $(this).next(), []
+
+window.addautocom = ->
+  autocom '.accon', configparamwritable
+  autocom '.acobjparam', objparamwritable
+  autocom '.acobj', objnames
+  $('.accon').focusout ->
+    if $.inArray($(this).val(), configparamwritablebool) >= 0
+      autocom $(this).next(), [
+        'true'
+        'false'
+      ]
+    else
+      autocom $(this).next(), []
